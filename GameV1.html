@@ -1,0 +1,379 @@
+<html>
+    <canvas id="gamecanvas" width="500" height ="700" style="background-color: black"></canvas>
+    <script>
+        var g_Canvas = document.getElementById("gamecanvas");
+        var g_Context = g_Canvas.getContext("2d");
+        
+        var g_xposSquare1 = 95;
+        var g_yposSquare1 = -80;
+        var g_sizeSquare1 = 80;
+        
+        var xspeed_square1 =1;
+        var yspeed_square1 =1;
+        
+        var g_xposSquare2 = 210;
+        var g_yposSquare2 = -80;
+        var g_sizeSquare2 = 80;
+        
+        var xspeed_square2 =2;
+        var yspeed_square2 =2;
+        
+        var g_xposSquare3 = 325;
+        var g_yposSquare3 = -80;
+        var g_sizeSquare3 = 80;
+        
+        var xspeed_square3 =1.75;
+        var yspeed_square3 =1.75;
+        
+        var g_xposObject = 210;
+        var g_yposObject = 600;
+        var g_sizeObject = 80;
+        
+        var g_xposButton = 200;
+        var g_yposButton = 350;
+        var g_ButtonWidth = 80;
+        var g_ButtonLength = 40;
+        
+        var xspeed_square3 =1.75;
+        var yspeed_square3 =1.75;
+        
+        var g_MoveRightFlag=0;
+        var g_MoveLeftFlag=0;
+        
+        var g_GameStopFlag =0;
+        
+        var g_DelayOpsticalTime =0;
+        var g_sec=0;
+        
+        var g_score=0;
+        
+        var g_MenuFlag=0;
+        
+        var CarImg = new Image();
+        CarImg.src = "car.png";
+        
+        var StoneImg = new Image();
+        StoneImg.src = "rock.png";
+        
+        
+        window.addEventListener("keydown",f_KeyDownEventHandler);
+        window.addEventListener("keyup",f_KeyUpEventHandler);
+       // window.addEventListener("mousemove",f_MoveMouseHandler);
+       // window.addEventListener("mouseup",f_ClickMouseUpHandler);
+        window.addEventListener("mousedown",f_ClickMouseDownHandler);
+        //window.addEventListener("onclick",f_ClickMouseHandler);
+        
+        var g_FrameRate = 30;
+        var g_TimeInterval = 1000/g_FrameRate;
+        var SetIntervalID = setInterval(Gameloop,g_TimeInterval);
+        
+        function Gameloop()
+        {
+            //logic calculation
+            f_Delay();
+            f_MoveSquare();
+            BoundryCollision();
+            f_SquareObjectCollision();
+            
+            //clear screen
+            f_ClearScreen();
+
+            //draw
+            f_DivideLine();
+            f_DrawSquare();
+            f_DrawObject();
+            f_DrawScore();
+            f_DrawButton();
+            f_DrawText();
+            f_DrawHeading();
+            
+        }
+        function f_ClickMouseDownHandler(l_Event)
+        {
+            if(l_Event.clientX>=g_xposButton && l_Event.clientX<=(g_xposButton+g_ButtonWidth)&&
+              l_Event.clientY>=g_yposButton && l_Event.clientY<=(g_yposButton+g_ButtonLength))
+                {
+                    g_MenuFlag =1;
+                }
+        }
+        function f_KeyDownEventHandler(l_Event)
+        {
+            if(l_Event.keyCode==37)
+                {
+                    g_MoveLeftFlag=1;
+                }
+            if(l_Event.keyCode==39)
+                {
+                    g_MoveRightFlag=1;
+                }
+            f_ObjectMove();
+        }
+        
+        function f_KeyUpEventHandler(l_Event)
+        {
+            if(l_Event.keyCode==37)
+                {
+                    g_MoveLeftFlag=0;
+                }
+            if(l_Event.keyCode==39)
+                {
+                    g_MoveRightFlag=0;
+                }
+        }
+        
+        function f_Delay()
+        {
+            g_DelayOpsticalTime++;
+            if(g_DelayOpsticalTime%g_FrameRate==0)
+                {
+                    g_sec++;
+                }
+        }
+        function BoundryCollision()
+        {
+            /*if((g_xposObject+g_sizeObject)>700)
+                {   
+                    g_xposObject = 700-g_sizeObject;
+                }
+            if(g_xposObject<100)
+                {
+                    g_xposObject = 100;
+                }*/
+            if(g_MoveLeftFlag)
+                {
+                    if(g_xposObject<g_xposSquare1)
+                        {
+                            g_xposObject=g_xposSquare1;
+                        }
+                }
+            if(g_MoveRightFlag)
+                {
+                    if(g_xposObject>g_xposSquare3)
+                        {
+                            g_xposObject=g_xposSquare3;
+                        }
+                }
+        }
+        
+        function f_DrawScore()
+        {
+            g_Context.font="17px Prospekt";
+            g_Context.fillStyle="white";
+            g_Context.fillText("SCORE: "+g_score,410,20);
+        }
+        
+        function f_DrawText()
+        {
+            if(g_MenuFlag==0)
+                {
+                    g_Context.font="17px Prospekt";
+                    g_Context.fillStyle="black";
+                    g_Context.fillText("START",215,375);
+                }
+        }
+        
+        function f_DrawHeading()
+        {
+            if(g_MenuFlag==0)
+                {
+                    g_Context.font="50px Peralta";
+                    g_Context.fillStyle="#20f220";
+                    g_Context.fillText("PLAY THE GAME",50,300);
+                }
+        }
+        
+        function f_SquareObjectCollision()
+        {
+            if(g_xposObject==95)
+                {
+                    if(g_xposSquare1+g_sizeSquare1 > g_xposObject &&           
+                       g_yposSquare1+g_sizeSquare1 > g_yposObject &&            
+                       g_xposSquare1 < g_xposObject+g_sizeObject &&           
+                       g_yposSquare1 < g_yposObject+g_sizeObject)
+                    {
+                            g_yposSquare1-=yspeed_square1;
+                            console.log("colliding");
+                            g_GameStopFlag=1;
+                    }
+                        
+                }
+            
+            if(g_xposObject==210)
+                {
+                    if(g_xposSquare2+g_sizeSquare2 > g_xposObject &&           
+                       g_yposSquare2+g_sizeSquare2 > g_yposObject &&            
+                       g_xposSquare2 < g_xposObject+g_sizeObject &&           
+                       g_yposSquare2 < g_yposObject+g_sizeObject)
+                    {
+                        g_yposSquare2-=yspeed_square2;
+                        console.log("colliding");
+                        g_GameStopFlag=1;
+                    }
+                }
+            if(g_xposObject==325)
+                {
+                    if(g_xposSquare3+g_sizeSquare3 > g_xposObject &&           
+                       g_yposSquare3+g_sizeSquare3 > g_yposObject &&            
+                       g_xposSquare3 < g_xposObject+g_sizeObject &&           
+                       g_yposSquare3 < g_yposObject+g_sizeObject)
+                    {
+                        g_yposSquare3-=yspeed_square3;
+                        console.log("colliding");
+                        g_GameStopFlag=1;
+                    }
+                    
+                }
+        }
+        
+        function f_MoveSquare()
+        {
+            if(g_MenuFlag==1)
+                {
+                     if(g_GameStopFlag==1)
+                        {
+                            return;
+                        }
+                    if(g_sec>=3)
+                        {
+                            g_yposSquare1+=yspeed_square1;
+                        }
+                     if(g_yposSquare1>g_Canvas.height)
+                        {
+                            g_yposSquare1 =0;
+                            yspeed_square1++;
+                            g_score++;
+                        }
+                    if(g_sec>=1)
+                        {
+                            g_yposSquare2+=yspeed_square2;
+                        }
+                    if(g_yposSquare2>g_Canvas.height)
+                        {
+                             g_yposSquare2 =0;
+                             yspeed_square2++;
+                            g_score++;
+                        }
+                    if(g_sec>=4)
+                        {
+                            g_yposSquare3+=yspeed_square3;
+                        }
+                    if(g_yposSquare3>g_Canvas.height)
+                        {
+                            g_yposSquare3 =0;
+                            yspeed_square3++;
+                            g_score++;
+                        }
+                }
+            
+        }
+        
+        function f_ObjectMove()
+        {
+            if(g_GameStopFlag==0)
+                {
+                     if(g_MoveRightFlag==1)
+                        {
+                            g_xposObject+=115;
+                        }
+                     if(g_MoveLeftFlag==1)
+                        {
+                            g_xposObject-=115;
+                        }
+                }
+           
+        }
+        
+        function f_ClearScreen()
+        {
+            g_Context.clearRect(0,0,g_Canvas.width,g_Canvas.height);
+           // g_Context.strokeRect(0,0,g_Canvas.width,g_Canvas.height);
+        }
+        function f_DivideLine()
+        {
+            if(g_MenuFlag==1)
+                {
+                    g_Context.beginPath();
+                    g_Context.moveTo(40,0);//(x,y axis)
+                    g_Context.lineTo(40,700); //(x,y axis)
+                    g_Context.closePath();
+
+                    g_Context.lineWidth ="80";
+                    g_Context.fillStyle="green";
+                    g_Context.fill();
+                    g_Context.strokeStyle="green";
+                    g_Context.stroke();
+
+                    g_Context.beginPath();
+                    g_Context.moveTo(190,0);//(x,y axis)
+                    g_Context.lineTo(190,700); //(x,y axis)
+                    g_Context.closePath();
+
+                    g_Context.lineWidth ="5";
+                    g_Context.fillStyle="white";
+                    g_Context.fill();
+                    g_Context.strokeStyle="white";
+                    g_Context.stroke();
+
+                    g_Context.beginPath();
+                    g_Context.moveTo(310,0);//(x,y axis)
+                    g_Context.lineTo(310,700); //(x,y axis)
+                    g_Context.closePath();
+
+                    g_Context.lineWidth ="5";
+                    g_Context.fillStyle="white";
+                    g_Context.fill();
+                    g_Context.strokeStyle="white";
+                    g_Context.stroke();
+
+
+
+                    g_Context.beginPath();
+                    g_Context.moveTo(460,0);//(x,y axis)
+                    g_Context.lineTo(460,700); //(x,y axis)
+                    g_Context.closePath();
+
+                    g_Context.lineWidth ="80";
+                    g_Context.fillStyle="green";
+                    g_Context.fill();
+                    g_Context.strokeStyle="green";
+                    g_Context.stroke();
+                }
+        }
+        
+        function f_DrawSquare()
+        {
+            if(g_MenuFlag==1)
+                {
+                    g_Context.fillStyle="red";
+                    /*g_Context.fillRect(g_xposSquare1,g_yposSquare1,g_sizeSquare1,g_sizeSquare1);
+                    g_Context.fillRect(g_xposSquare2,g_yposSquare2,g_sizeSquare2,g_sizeSquare2);
+                    g_Context.fillRect(g_xposSquare3,g_yposSquare3,g_sizeSquare3,g_sizeSquare3);*/
+                    g_Context.drawImage(StoneImg,g_xposSquare1,g_yposSquare1,g_sizeSquare1,g_sizeSquare1);
+                    g_Context.drawImage(StoneImg,g_xposSquare2,g_yposSquare2,g_sizeSquare2,g_sizeSquare2);
+                    g_Context.drawImage(StoneImg,g_xposSquare3,g_yposSquare3,g_sizeSquare3,g_sizeSquare3);
+                }
+            
+        }
+        
+        function f_DrawObject()
+        {
+            if(g_MenuFlag==1)
+                {
+                     g_Context.fillStyle="blue";
+                    //g_Context.fillRect(g_xposObject,g_yposObject,g_sizeObject,g_sizeObject);
+                    g_Context.drawImage(CarImg,g_xposObject,g_yposObject,g_sizeObject,g_sizeObject);
+                }
+        }
+        
+        function f_DrawButton()
+        {
+            if(g_MenuFlag==0)
+                {
+                    g_Context.fillStyle = "white";
+                    g_Context.fillRect(g_xposButton,g_yposButton,g_ButtonWidth,g_ButtonLength);
+                }
+            
+        }
+        
+    </script>
+</html>
